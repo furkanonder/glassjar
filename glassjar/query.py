@@ -16,5 +16,24 @@ class QueryManager:
             except KeyError:
                 raise DoesNotExist("Object does not exist.")
 
+    def all(self):
+        with shelve.open(DB_NAME, writeback=True) as db:
+            try:
+                return list(db["tables"][self.table_name]["records"].values())
+            except KeyError:
+                return []
+
+    def count(self):
+        return len(self.all())
+
     def first(self):
-        return self.get(id=1)
+        try:
+            return self.all()[0]
+        except IndexError:
+            return []
+
+    def last(self):
+        try:
+            return self.all()[-1]
+        except IndexError:
+            return []
