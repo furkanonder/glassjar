@@ -23,7 +23,7 @@ class DatabaseManager:
             if db["tables"].get(self.table_name) is None:
                 db["tables"][self.table_name] = {"index": 1, "records": {}}
 
-    def get_record(self, id):
+    def _get_record(self, id):
         with shelve.open(DB_NAME, writeback=True) as db:
             try:
                 obj = db["tables"][self.table_name]["records"][id]
@@ -31,21 +31,21 @@ class DatabaseManager:
             except KeyError:
                 raise DoesNotExist("Object does not exist.")
 
-    def set_record(self, id, value):
+    def _set_record(self, id, value):
         with shelve.open(DB_NAME, writeback=True) as db:
             db["tables"][self.table_name]["records"][id] = value
 
-    def update_record(self):
-        db_obj = self.get_record(self.id)
+    def _update_record(self):
+        db_obj = self._get_record(self.id)
 
         for field_name, field_value in self.fields.items():
             obj_value = getattr(self, field_name)
             if getattr(db_obj, field_name) != obj_value:
                 setattr(db_obj, field_name, obj_value)
 
-        self.set_record(self.id, db_obj)
+        self._set_record(self.id, db_obj)
 
-    def create_record(self):
+    def _create_record(self):
         with shelve.open(DB_NAME, writeback=True) as db:
             table = db["tables"][self.table_name]
             setattr(self, "id", table["index"])
@@ -53,7 +53,7 @@ class DatabaseManager:
             table["index"] += 1
         return self
 
-    def delete_record(self, id):
+    def _delete_record(self, id):
         with shelve.open(DB_NAME, writeback=True) as db:
             try:
                 del db["tables"][self.table_name]["records"][id]

@@ -58,14 +58,14 @@ class Model(DatabaseManager, metaclass=BaseModel):
         return {key: getattr(self, key) for key in self.fields}
 
     def update(self):
-        self.update_record()
+        self._update_record()
 
     def delete(self, id):
-        self.delete_record(id)
+        self._delete_record(id)
 
     def save(self):
         if getattr(self, "id"):
-            self.update_record()
+            self._update_record()
         else:
-            self.create_record()
+            self._create_record()
         return self
