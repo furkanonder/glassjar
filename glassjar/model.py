@@ -24,6 +24,16 @@ class Model(DatabaseManager, metaclass=BaseModel):
         super().__init__(**fields)
         self.id = None
 
+    def __repr__(self):
+        kwargs = ", ".join(
+            f"{key}={getattr(self, key)!r}" for key in self.fields
+        )
+        return f"{type(self).__name__}({kwargs})"
+
+    @property
+    def as_dict(self):
+        return {key: getattr(self, key) for key in self.fields}
+
     def update(self):
         self.update_record()
 
