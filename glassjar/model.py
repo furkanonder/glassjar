@@ -25,6 +25,7 @@ class BaseModel(type):
     def __new__(mcs, cls_name, bases, cls_dict):
         slots = []
         fields = cls_dict.get("__annotations__", {})
+        fields.update({"id": int})
 
         for field_name, field_type in fields.items():
             field = Field(field_name, field_type)
@@ -35,6 +36,7 @@ class BaseModel(type):
 
         obj = super().__new__(mcs, cls_name, bases, cls_dict)
         setattr(obj, "records", QueryManager(cls_name))
+        setattr(obj, "table_name", f"{cls_name}_table")
 
         return obj
 

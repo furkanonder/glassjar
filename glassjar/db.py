@@ -5,10 +5,9 @@ from glassjar.exceptions import DoesNotExist
 
 
 class DatabaseManager:
-    __slots__ = ("fields", "table_name", "id")
+    __slots__ = "fields"
 
     def __init__(self, **fields):
-        self.table_name = f"{type(self).__name__}_table"
         self.fields = fields
         self.id = 0
 
