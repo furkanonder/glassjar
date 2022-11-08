@@ -72,3 +72,7 @@ class TestJar(unittest.TestCase):
 
         with self.assertRaises(AttributeError):
             car_obj.dummy_attr = "dummy"
+
+    def test_type_check(self):
+        with self.assertRaises(TypeError):
+            Car(brand="Tesla", model="Model S", year=2022.4)

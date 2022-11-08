@@ -3,9 +3,10 @@ from glassjar.query import QueryManager
 
 
 class Field:
-    def __init__(self, name):
+    def __init__(self, name, field_type):
         self.name = name
         self.storage_name = f"_{name}"
+        self.field_type = field_type
 
     def __get__(self, instance, owner=None):
         if instance is None:
@@ -13,6 +14,10 @@ class Field:
         return getattr(instance, self.storage_name)
 
     def __set__(self, instance, value):
+        if self.field_type != type(value):
+            raise TypeError(
+                f"Types are incompatible. Expected type: {self.field_type} | Given type: {type(value)}"
+            )
         setattr(instance, self.storage_name, value)
 
 
@@ -22,7 +27,7 @@ class BaseModel(type):
         fields = cls_dict.get("__annotations__", {})
 
         for field_name, field_type in fields.items():
-            field = Field(field_name)
+            field = Field(field_name, field_type)
             cls_dict[field_name] = field
             slots.append(field.storage_name)
 
