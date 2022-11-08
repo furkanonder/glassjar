@@ -6,15 +6,16 @@ from glassjar.exceptions import DoesNotExist
 
 class DatabaseManager:
     def __init__(self, **fields):
-        self.cls = type(self)
-        self.table_name = f"{self.cls.__name__}_table"
-        self.create_table()
+        self.table_name = f"{type(self).__name__}_table"
         self.fields = fields
+        self.id = 0
 
-        for field_name, field_value in fields.items():
+        for field_name, field_value in self.fields.items():
             setattr(self, field_name, field_value)
 
-    def create_table(self):
+        self.__create_table()
+
+    def __create_table(self):
         with shelve.open(DB_NAME, writeback=True) as db:
             if db.get("tables") is None:
                 db["tables"] = {}

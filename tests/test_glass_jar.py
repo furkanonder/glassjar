@@ -3,24 +3,18 @@ import shelve
 import unittest
 
 from glassjar.exceptions import DoesNotExist
-from glassjar.model import Field, Model
+from glassjar.model import Model
 
 
 class Item(Model):
-    name = Field()
-    count = Field()
-
-    def __str__(self):
-        return f"Item Object - {id(self)}"
+    name: str
+    count: int
 
 
 class Car(Model):
-    brand = Field()
-    model = Field()
-    year = Field()
-
-    def __str__(self):
-        return f"Car Object - {id(self)}"
+    brand: str
+    model: str
+    year: int
 
 
 class TestJar(unittest.TestCase):

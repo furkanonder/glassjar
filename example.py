@@ -1,9 +1,9 @@
-from glassjar.model import Field, Model
+from glassjar.model import Model
 
 
 class Item(Model):
-    name = Field()
-    count = Field()
+    name: str
+    count: int
 
 
 Item(name="test item", count=20).save()
