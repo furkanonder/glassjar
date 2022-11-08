@@ -18,11 +18,15 @@ class Field:
 
 class BaseModel(type):
     def __new__(mcs, cls_name, bases, cls_dict):
+        slots = []
         fields = cls_dict.get("__annotations__", {})
 
         for field_name, field_type in fields.items():
             field = Field(field_name)
             cls_dict[field_name] = field
+            slots.append(field.storage_name)
+
+        cls_dict["__slots__"] = slots
 
         obj = super().__new__(mcs, cls_name, bases, cls_dict)
         setattr(obj, "records", QueryManager(cls_name))

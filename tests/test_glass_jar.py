@@ -66,3 +66,9 @@ class TestJar(unittest.TestCase):
 
         self.assertRaises(DoesNotExist, Car.records.get, id=1)
         self.assertRaises(DoesNotExist, car_obj.delete, id=1)
+
+    def test_slot_feature(self):
+        car_obj = Car(brand="Tesla", model="Model S", year=2022)
+
+        with self.assertRaises(AttributeError):
+            car_obj.dummy_attr = "dummy"
