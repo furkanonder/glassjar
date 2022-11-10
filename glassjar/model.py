@@ -1,4 +1,4 @@
-from glassjar.db import DatabaseManager
+from glassjar.db import DatabaseManager, create_table
 from glassjar.query import QueryManager
 
 
@@ -33,16 +33,16 @@ class BaseModel(type):
             slots.append(field.storage_name)
 
         cls_dict["__slots__"] = slots
-
         obj = super().__new__(mcs, cls_name, bases, cls_dict)
         setattr(obj, "records", QueryManager(cls_name))
         setattr(obj, "table_name", f"{cls_name}_table")
+        create_table(f"{cls_name}_table")
 
         return obj
 
 
 class Model(DatabaseManager, metaclass=BaseModel):
-    records = None
+    records: QueryManager
 
     def __init__(self, **fields):
         super().__init__(**fields)
@@ -64,7 +64,7 @@ class Model(DatabaseManager, metaclass=BaseModel):
         self._delete_record(id)
 
     def save(self):
-        if getattr(self, "id"):
+        if hasattr(self, "id"):
             self._update_record()
         else:
             self._create_record()

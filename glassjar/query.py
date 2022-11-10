@@ -1,6 +1,7 @@
-import shelve
+import pickle
 
 from glassjar.constants import DB_NAME
+from glassjar.db import DB
 from glassjar.exceptions import DoesNotExist
 
 
@@ -9,17 +10,19 @@ class QueryManager:
         self.table_name = f"{name}_table"
 
     def get(self, id):
-        with shelve.open(DB_NAME, writeback=True) as db:
+        with DB(DB_NAME, write_back=True) as db:
             try:
-                obj = db["tables"][self.table_name]["records"][id]
-                return obj
+                obj = db.db["tables"][self.table_name]["records"][id]
+                return pickle.loads(obj)
             except KeyError:
                 raise DoesNotExist("Object does not exist.")
 
     def all(self):
-        with shelve.open(DB_NAME, writeback=True) as db:
+        with DB(DB_NAME, write_back=True) as db:
             try:
-                return list(db["tables"][self.table_name]["records"].values())
+                values = db.db["tables"][self.table_name]["records"].values()
+                objs = [pickle.loads(val) for val in values]
+                return objs
             except KeyError:
                 return []
 

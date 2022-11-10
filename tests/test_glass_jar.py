@@ -2,6 +2,8 @@ import pathlib
 import shelve
 import unittest
 
+from glassjar.constants import DB_NAME
+from glassjar.db import create_table
 from glassjar.exceptions import DoesNotExist
 from glassjar.model import Model
 
@@ -19,11 +21,11 @@ class Car(Model):
 
 class TestBase(unittest.TestCase):
     def setUp(self):
-        with shelve.open("database.jar", writeback=True) as db:
-            db["tables"] = {}
+        create_table("Item_table")
+        create_table("Car_table")
 
     def tearDown(self):
-        pathlib.Path("database.jar").unlink()
+        pathlib.Path(DB_NAME).unlink()
 
 
 class TestModel(TestBase):
