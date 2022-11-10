@@ -1,5 +1,4 @@
 import pathlib
-import shelve
 import unittest
 
 from glassjar.constants import DB_NAME
@@ -62,6 +61,14 @@ class TestModel(TestBase):
 
         with self.assertRaises(AttributeError):
             car_obj.dummy_attr = "dummy"
+
+    def test_change_table_name(self):
+        car_obj = Car(brand="Tesla", model="Model S", year=2022)
+
+        with self.assertRaises(AttributeError) as exc:
+            car_obj.table_name = "changed_table"
+
+        self.assertEqual(type(exc.exception), AttributeError)
 
     def test_type_check(self):
         with self.assertRaises(TypeError):
