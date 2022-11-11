@@ -13,11 +13,11 @@ from glassjar.exceptions import DoesNotExist
 
 
 class DB:
-    def __init__(self, file_name: str, write_back: bool = False):
+    def __init__(self, file_name: str, write_back: bool = False) -> None:
         self.file_name = file_name
         self.write_back = write_back
-        self.cache: dict = {}
-        self.db: dict = {}
+        self.cache: dict[Hashable, Any] = {}
+        self.db: dict[Hashable, Any] = {}
         self.create_or_set_db()
 
     def __getitem__(self, key: Hashable) -> Any:
@@ -85,7 +85,7 @@ class DatabaseManager:
     table_name: ClassVar[str]
     id: ClassVar[int]
 
-    def __init__(self, **fields: Any) -> None:
+    def __init__(self, **fields: dict[str, Any]) -> None:
         self.fields = fields
         for field_name, field_value in self.fields.items():
             setattr(self, field_name, field_value)
