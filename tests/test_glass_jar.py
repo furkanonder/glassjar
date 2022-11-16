@@ -91,29 +91,30 @@ class TestQuery(TestBase):
         self.assertEqual(car_db_obj.year, car_obj.year)
 
     def test_all(self):
-        for _ in range(10):
-            Item(name="test item", count=20).save()
-        self.assertEqual(len(Item.records.all()), 10)
+        items = [Item(name="test item", count=20).save() for _ in range(10)]
+
+        for item, other_item in zip(items, Item.records.all()):
+            self.assertEqual(item, other_item)
+
+        self.assertEqual(len(Item.records.all()), len(items))
 
     def test_first(self):
-        item_list = []
-
         for _ in range(10):
-            item = Item(name="test item", count=20).save()
-            item_list.append(item)
+            Item(name="test item", count=20).save()
 
-        self.assertEqual(Item.records.first().id, item_list[0].id)
+        items = Item.records.all()
+        self.assertEqual(Item.records.first(), items.first())
 
     def test_last(self):
-        item_list = []
-
         for _ in range(10):
-            item = Item(name="test item", count=20).save()
-            item_list.append(item)
+            Item(name="test item", count=20).save()
 
-        self.assertEqual(Item.records.last().id, item_list[-1].id)
+        items = Item.records.all()
+        self.assertEqual(Item.records.last(), items.last())
 
     def test_count(self):
         for _ in range(5):
             Item(name="test item", count=20).save()
-        self.assertEqual(Item.records.count(), 5)
+
+        items = Item.records.all()
+        self.assertEqual(Item.records.count(), items.count())
