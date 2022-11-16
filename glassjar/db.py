@@ -90,7 +90,7 @@ class DatabaseManager:
         for field_name, field_value in self.fields.items():
             setattr(self, field_name, field_value)
 
-    def _get_record(self, id: int) -> Any:
+    def _get_record(self, id: int) -> bytes:
         with DB(DB_NAME, write_back=True) as db:
             try:
                 obj = db.db["tables"][self.table_name]["records"][id]
