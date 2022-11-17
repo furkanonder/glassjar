@@ -74,6 +74,14 @@ class TestModel(TestBase):
         with self.assertRaises(TypeError):
             Car(brand="Tesla", model="Model S", year=2022.4)
 
+    def test_as_dict(self):
+        car_obj = Car(brand="Tesla", model="Model S", year=2022)
+        car_dict = car_obj.as_dict()
+
+        self.assertEqual(car_obj.brand, car_dict["brand"])
+        self.assertEqual(car_obj.model, car_dict["model"])
+        self.assertEqual(car_obj.year, car_dict["year"])
+
 
 class TestQuery(TestBase):
     def test_get(self):

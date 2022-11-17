@@ -34,9 +34,8 @@ class QuerySet(Generic[T]):
     def __len__(self) -> int:
         return len(self.__objs)
 
-    @property
     def as_dict(self) -> dict[int, dict[str, Any]]:
-        return {obj.id: obj.as_dict for obj in self.__objs}
+        return {obj.id: obj.as_dict() for obj in self.__objs}
 
     def count(self) -> int:
         return len(self.__objs)
@@ -125,7 +124,6 @@ class Model(DatabaseManager, metaclass=BaseModel):
         )
         return f"{type(self).__name__}({kwargs})"
 
-    @property
     def as_dict(self) -> dict[str, Any]:
         return {key: getattr(self, key) for key in self.fields}
 
