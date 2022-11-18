@@ -13,7 +13,7 @@ def get_long_description():
 
 setup(
     name="glassjar",
-    version="0.0.1",
+    version="0.1.0",
     long_description=get_long_description(),
     long_description_content_type="text/markdown",
     description="Glassjar is the pickled database that provide Object-Relational Mapper.",
