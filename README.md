@@ -1,7 +1,7 @@
 # GlassJar
 
 <div align="center">
-  <img src="/assets/logo/glassjar.png"/>
+  <img src="/assets/logo/glassjar.png" width=200px/>
   <h3>GlassJar is the pickled database that provide Object-Relational Mapper.</h3>
   <a href="https://github.com/furkanonder/glassjar/actions"><img alt="Actions Status" src="https://github.com/furkanonder/glassjar/workflows/Test/badge.svg"></a>
   <a href="https://github.com/furkanonder/glassjar/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/furkanonder/glassjar"></a>
