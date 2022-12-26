@@ -3,7 +3,6 @@ from __future__ import annotations
 import pickle
 from typing import Any, ClassVar, Generic, NoReturn, Type, TypeVar
 
-from glassjar.constants import DB_NAME
 from glassjar.db import DB, DatabaseManager, create_table
 from glassjar.exceptions import DoesNotExist
 from glassjar.field import Field
@@ -58,7 +57,7 @@ class QueryManager:
         self.table_name = f"{name}_table"
 
     def get(self, id: int) -> T | NoReturn:
-        with DB(DB_NAME, write_back=True) as db:
+        with DB() as db:
             try:
                 obj = db.db["tables"][self.table_name]["records"][id]
                 return pickle.loads(obj)
@@ -66,7 +65,7 @@ class QueryManager:
                 raise DoesNotExist("Object does not exist.")
 
     def all(self) -> QuerySet:
-        with DB(DB_NAME, write_back=True) as db:
+        with DB() as db:
             try:
                 values = db.db["tables"][self.table_name]["records"].values()
                 objs = [pickle.loads(val) for val in values]
@@ -141,7 +140,7 @@ class Model(DatabaseManager, metaclass=BaseModel):
         return self
 
     def __create_record(self) -> "Model":
-        with DB(DB_NAME, write_back=True) as db:
+        with DB() as db:
             table = db.db["tables"][self.table_name]
             setattr(self, "id", table["index"])
             table["records"].update({table["index"]: pickle.dumps(self)})

@@ -1,10 +1,7 @@
 from __future__ import annotations
 
-import contextlib
 import os
 import pickle
-from io import BytesIO
-from pickle import Pickler, Unpickler
 from types import TracebackType
 from typing import Any, ClassVar, Hashable
 
@@ -13,33 +10,9 @@ from glassjar.exceptions import DoesNotExist
 
 
 class DB:
-    def __init__(self, file_name: str, write_back: bool = False) -> None:
-        self.file_name = file_name
-        self.write_back = write_back
-        self.cache: dict[Hashable, Any] = {}
+    def __init__(self) -> None:
         self.db: dict[Hashable, Any] = {}
-        self.create_or_set_db()
-
-    def __getitem__(self, key: Hashable) -> Any:
-        try:
-            value = self.cache[key]
-        except KeyError:
-            value = Unpickler(BytesIO(self.db[key])).load()
-            if self.write_back:
-                self.cache[key] = value
-        return value
-
-    def __setitem__(self, key: Hashable, value: Any) -> None:
-        if self.write_back:
-            self.cache[key] = value
-        f = BytesIO()
-        Pickler(f, pickle.HIGHEST_PROTOCOL).dump(value)
-        self.db[key] = f.getvalue()
-
-    def __delitem__(self, key: Hashable) -> None:
-        del self.db[key]
-        with contextlib.suppress(KeyError):
-            del self.cache[key]
+        self.create_or_get_db()
 
     def __enter__(self) -> "DB":
         return self
@@ -50,30 +23,23 @@ class DB:
         exc_val: BaseException,
         exc_tb: TracebackType,
     ) -> None:
-        self.close()
+        with open(DB_NAME, "wb") as fp:
+            pickle.dump(self.db, fp)
 
-    def create_or_set_db(self) -> None:
+    def create_or_get_db(self) -> None:
         try:
-            if os.path.getsize(self.file_name):
-                with open(self.file_name, "rb") as fp:
+            if os.path.getsize(DB_NAME):
+                with open(DB_NAME, "rb") as fp:
                     self.db = pickle.load(fp)
         except FileNotFoundError:
             self.db["tables"] = {}
-            with open(self.file_name, "wb") as fp:
+            with open(DB_NAME, "wb") as fp:
                 fp.write(b"")
 
     def get(self, key: Hashable, default: Any = None) -> Any:
         if key in self.db:
             return self.db[key]
         return default
-
-    def close(self) -> None:
-        if self.write_back and self.cache:
-            for key, entry in self.cache.items():
-                self[key] = entry
-            self.cache = {}
-        with open(self.file_name, "wb") as fp:
-            pickle.dump(self.db, fp)
 
     def initialize_table(self, table_name: str) -> None:
         if self.db["tables"].get(table_name) is None:
@@ -91,7 +57,7 @@ class DatabaseManager:
             setattr(self, field_name, field_value)
 
     def _get_record(self, id: int) -> bytes:
-        with DB(DB_NAME, write_back=True) as db:
+        with DB() as db:
             try:
                 obj = db.db["tables"][self.table_name]["records"][id]
                 return obj
@@ -99,7 +65,7 @@ class DatabaseManager:
                 raise DoesNotExist("Object does not exist.")
 
     def _set_record(self, id: int, value: Any) -> None:
-        with DB(DB_NAME, write_back=True) as db:
+        with DB() as db:
             value = pickle.dumps(value)
             db.db["tables"][self.table_name]["records"][id] = value
 
@@ -114,7 +80,7 @@ class DatabaseManager:
         self._set_record(self.id, db_obj)
 
     def _delete_record(self, id: int) -> None:
-        with DB(DB_NAME, write_back=True) as db:
+        with DB() as db:
             try:
                 del db.db["tables"][self.table_name]["records"][id]
             except KeyError:
@@ -122,5 +88,5 @@ class DatabaseManager:
 
 
 def create_table(table_name: str) -> None:
-    with DB(DB_NAME, write_back=True) as db:
+    with DB() as db:
         db.initialize_table(table_name)
