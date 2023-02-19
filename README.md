@@ -9,6 +9,11 @@
   <a href="https://img.shields.io/pypi/pyversions/glassjar"><img alt="Supported Versions" src="https://img.shields.io/pypi/pyversions/glassjar"></a>
 </div>
 
+## Motivation
+
+Glassjar is a database that, unlike other databases, stores records as Python objects in
+the database and allows you to use them with ORM.
+
 ## Installation
 
 _glassjar_ can be installed by running `pip install glassjar`.
