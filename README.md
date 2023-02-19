@@ -29,3 +29,17 @@ Item(name='test item', count=20)
 {'name': 'test item', 'count': 20}
 >>>
 ```
+
+ORM operations;
+
+```python
+>>> item.id
+1
+>>> Item.records.get(id=1)
+Item(name='test item', count=20)
+>>> Item.records.first()
+Item(name='test item', count=20)
+>>> last_item = Item(name='last item', count=1).save()
+>>> Item.records.last()
+Item(name='last item', count=1)
+```
