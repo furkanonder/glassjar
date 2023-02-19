@@ -12,3 +12,20 @@
 ## Installation
 
 _glassjar_ can be installed by running `pip install glassjar`.
+
+## Example
+
+```python
+>>> from glassjar.model import Model
+>>>
+>>> class Item(Model):
+...     name: str
+...     count: int
+...
+>>> item = Item(name="test item", count=20).save()
+>>> item
+Item(name='test item', count=20)
+>>> item.as_dict()
+{'name': 'test item', 'count': 20}
+>>>
+```
