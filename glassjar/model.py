@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-import pickle
 from typing import Any, ClassVar, Generic, NoReturn, Type, TypeVar
 
-from glassjar.db import DB, DatabaseManager, create_table
-from glassjar.exceptions import DoesNotExist
+from glassjar.db import DB, create_table
 from glassjar.field import Field
 
 T = TypeVar("T", bound="Model")
@@ -52,23 +50,19 @@ class QuerySet(Generic[T]):
             return QuerySet([])
 
 
-class QueryManager:
+class QueryManager(Generic[T]):
     def __init__(self, name: str) -> None:
         self.table_name = f"{name}_table"
 
-    def get(self, id: int) -> T | NoReturn:
-        with DB() as db:
-            try:
-                obj = db.db["tables"][self.table_name]["records"][id]
-                return pickle.loads(obj)
-            except KeyError:
-                raise DoesNotExist("Object does not exist.")
+    def get(self, id: int) -> T:
+        with DB(self.table_name) as db:
+            obj = db.get_obj(id)
+            return obj
 
     def all(self) -> QuerySet:
-        with DB() as db:
+        with DB(self.table_name) as db:
             try:
-                values = db.db["tables"][self.table_name]["records"].values()
-                objs = [pickle.loads(val) for val in values]
+                objs = db.get_objs()
                 return QuerySet(objs)
             except KeyError:
                 return QuerySet([])
@@ -87,7 +81,7 @@ class BaseModel(type):
     def __new__(
         mcs, cls_name: str, bases: tuple, cls_dict: Any
     ) -> Type[T] | "BaseModel":
-        slots = []
+        slots = ["fields"]
         fields = cls_dict.get("__annotations__", {})
         fields.update({"id": int})
 
@@ -105,11 +99,15 @@ class BaseModel(type):
         return obj
 
 
-class Model(DatabaseManager, metaclass=BaseModel):
+class Model(metaclass=BaseModel):
+    table_name: ClassVar[str]
+    id: ClassVar[int]
     records: ClassVar[QueryManager]
 
-    def __init__(self, **fields: Any) -> None:
-        super().__init__(**fields)
+    def __init__(self, **fields: dict[str, Any]) -> None:
+        self.fields = fields
+        for field_name, field_value in self.fields.items():
+            setattr(self, field_name, field_value)
 
     def __eq__(self, other):
         if self.as_dict == self.as_dict:
@@ -127,22 +125,17 @@ class Model(DatabaseManager, metaclass=BaseModel):
         return {key: getattr(self, key) for key in self.fields}
 
     def update(self) -> None:
-        self._update_record()
+        with DB(self.table_name) as db:
+            db.update_record(self.id, self)
 
     def delete(self, id: int) -> None:
-        self._delete_record(id)
+        with DB(self.table_name) as db:
+            db.delete_record(id)
 
     def save(self) -> "Model":
         if hasattr(self, "id"):
-            self._update_record()
+            self.update()
         else:
-            self.__create_record()
-        return self
-
-    def __create_record(self) -> "Model":
-        with DB() as db:
-            table = db.db["tables"][self.table_name]
-            setattr(self, "id", table["index"])
-            table["records"].update({table["index"]: pickle.dumps(self)})
-            table["index"] += 1
+            with DB(self.table_name) as db:
+                db.create_record(self)
         return self

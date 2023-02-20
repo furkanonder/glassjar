@@ -3,15 +3,21 @@ from __future__ import annotations
 import os
 import pickle
 from types import TracebackType
-from typing import Any, ClassVar, Hashable
+from typing import TYPE_CHECKING, Any, Generic, Hashable, List, TypeVar
 
 from glassjar.constants import DB_NAME
 from glassjar.exceptions import DoesNotExist
 
+if TYPE_CHECKING:
+    from glassjar.model import Model
 
-class DB:
-    def __init__(self) -> None:
+T = TypeVar("T", bound="Model")
+
+
+class DB(Generic[T]):
+    def __init__(self, table_name: str) -> None:
         self.db: dict[Hashable, Any] = {}
+        self.table_name = table_name
         self.create_or_get_db()
 
     def __enter__(self) -> "DB":
@@ -36,57 +42,47 @@ class DB:
             with open(DB_NAME, "wb") as fp:
                 fp.write(b"")
 
-    def get(self, key: Hashable, default: Any = None) -> Any:
-        if key in self.db:
-            return self.db[key]
-        return default
-
     def initialize_table(self, table_name: str) -> None:
         if self.db["tables"].get(table_name) is None:
             self.db["tables"][table_name] = {"index": 1, "records": {}}
 
+    def get_obj(self, _id: int) -> T:
+        try:
+            record = self.db["tables"][self.table_name]["records"][_id]
+            obj = pickle.loads(record)
+            return obj
+        except KeyError:
+            raise DoesNotExist("Object does not exist.")
 
-class DatabaseManager:
-    __slots__ = "fields"
-    table_name: ClassVar[str]
-    id: ClassVar[int]
+    def get_objs(self) -> List[T]:
+        records = self.db["tables"][self.table_name]["records"].values()
+        objs = [pickle.loads(val) for val in records]
+        return objs
 
-    def __init__(self, **fields: dict[str, Any]) -> None:
-        self.fields = fields
-        for field_name, field_value in self.fields.items():
-            setattr(self, field_name, field_value)
+    def delete_record(self, _id: int) -> None:
+        try:
+            del self.db["tables"][self.table_name]["records"][_id]
+        except KeyError:
+            raise DoesNotExist("Object does not exist.")
 
-    def _get_record(self, id: int) -> bytes:
-        with DB() as db:
-            try:
-                obj = db.db["tables"][self.table_name]["records"][id]
-                return obj
-            except KeyError:
-                raise DoesNotExist("Object does not exist.")
+    def create_record(self, obj: T) -> None:
+        table = self.db["tables"][self.table_name]
+        setattr(obj, "id", table["index"])
+        table["records"].update({table["index"]: pickle.dumps(obj)})
+        table["index"] += 1
 
-    def _set_record(self, id: int, value: Any) -> None:
-        with DB() as db:
-            value = pickle.dumps(value)
-            db.db["tables"][self.table_name]["records"][id] = value
+    def update_record(self, _id: int, obj: T) -> None:
+        db_obj = self.get_obj(_id)
 
-    def _update_record(self) -> None:
-        db_obj = pickle.loads(self._get_record(self.id))
-
-        for field_name, field_value in self.fields.items():
-            obj_value = getattr(self, field_name)
+        for field_name, field_value in db_obj.fields.items():
+            obj_value = getattr(obj, field_name)
             if getattr(db_obj, field_name) != obj_value:
                 setattr(db_obj, field_name, obj_value)
 
-        self._set_record(self.id, db_obj)
-
-    def _delete_record(self, id: int) -> None:
-        with DB() as db:
-            try:
-                del db.db["tables"][self.table_name]["records"][id]
-            except KeyError:
-                raise DoesNotExist("Object does not exist.")
+        value = pickle.dumps(db_obj)
+        self.db["tables"][self.table_name]["records"][_id] = value
 
 
 def create_table(table_name: str) -> None:
-    with DB() as db:
+    with DB(table_name) as db:
         db.initialize_table(table_name)
