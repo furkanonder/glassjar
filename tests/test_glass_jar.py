@@ -126,3 +126,7 @@ class TestQuery(TestBase):
 
         items = Item.records.all()
         self.assertEqual(Item.records.count(), items.count())
+
+    def test_create(self):
+        item = Item.records.create(name="fresh item")
+        self.assertEqual(item.name, "fresh item")

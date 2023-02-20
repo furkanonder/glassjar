@@ -51,8 +51,9 @@ class QuerySet(Generic[T]):
 
 
 class QueryManager(Generic[T]):
-    def __init__(self, name: str) -> None:
+    def __init__(self, name: str, model_cls: Type[T]) -> None:
         self.table_name = f"{name}_table"
+        self.__model_cls = model_cls
 
     def get(self, id: int) -> T:
         with DB(self.table_name) as db:
@@ -76,6 +77,10 @@ class QueryManager(Generic[T]):
     def last(self) -> QuerySet | T:
         return self.all().last()
 
+    def create(self, **kwargs: Any) -> T:
+        obj = self.__model_cls(**kwargs)
+        return obj
+
 
 class BaseModel(type):
     def __new__(
@@ -92,7 +97,7 @@ class BaseModel(type):
 
         cls_dict["__slots__"] = slots
         obj = super().__new__(mcs, cls_name, bases, cls_dict)
-        setattr(obj, "records", QueryManager(cls_name))
+        setattr(obj, "records", QueryManager(cls_name, obj))
         setattr(obj, "table_name", f"{cls_name}_table")
         create_table(f"{cls_name}_table")
 
@@ -104,7 +109,7 @@ class Model(metaclass=BaseModel):
     id: ClassVar[int]
     records: ClassVar[QueryManager]
 
-    def __init__(self, **fields: dict[str, Any]) -> None:
+    def __init__(self, **fields: Any) -> None:
         self.fields = fields
         for field_name, field_value in self.fields.items():
             setattr(self, field_name, field_value)
