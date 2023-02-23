@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import pickle
 from types import TracebackType
-from typing import TYPE_CHECKING, Any, Generic, Hashable, List, TypeVar
+from typing import TYPE_CHECKING, Any, Hashable, List
 
 from glassjar.constants import DB_NAME
 from glassjar.exceptions import DoesNotExist
@@ -11,10 +11,8 @@ from glassjar.exceptions import DoesNotExist
 if TYPE_CHECKING:
     from glassjar.model import Model
 
-T = TypeVar("T", bound="Model")
 
-
-class DB(Generic[T]):
+class DB:
     def __init__(self, table_name: str) -> None:
         self.db: dict[Hashable, Any] = {}
         self.table_name = table_name
@@ -46,7 +44,7 @@ class DB(Generic[T]):
         if self.db["tables"].get(table_name) is None:
             self.db["tables"][table_name] = {"index": 1, "records": {}}
 
-    def get_obj(self, _id: int) -> T:
+    def get_obj(self, _id: int) -> Model:
         try:
             record = self.db["tables"][self.table_name]["records"][_id]
             obj = pickle.loads(record)
@@ -54,7 +52,7 @@ class DB(Generic[T]):
         except KeyError:
             raise DoesNotExist("Object does not exist.")
 
-    def get_objs(self) -> List[T]:
+    def get_objs(self) -> List[Model]:
         records = self.db["tables"][self.table_name]["records"].values()
         objs = [pickle.loads(val) for val in records]
         return objs
@@ -65,13 +63,13 @@ class DB(Generic[T]):
         except KeyError:
             raise DoesNotExist("Object does not exist.")
 
-    def create_record(self, obj: T) -> None:
+    def create_record(self, obj: Model) -> None:
         table = self.db["tables"][self.table_name]
         setattr(obj, "id", table["index"])
         table["records"].update({table["index"]: pickle.dumps(obj)})
         table["index"] += 1
 
-    def update_record(self, _id: int, obj: T) -> None:
+    def update_record(self, _id: int, obj: Model) -> None:
         db_obj = self.get_obj(_id)
 
         for field_name, field_value in db_obj.fields.items():

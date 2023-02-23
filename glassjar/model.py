@@ -1,22 +1,20 @@
 from __future__ import annotations
 
-from typing import Any, ClassVar, Generic, NoReturn, Type, TypeVar
+from typing import Any, ClassVar, NoReturn, Type
 
 from glassjar.db import DB, create_table
 from glassjar.field import Field
 
-T = TypeVar("T", bound="Model")
 
-
-class QuerySet(Generic[T]):
-    def __init__(self, objs: list[T]) -> None:
+class QuerySet:
+    def __init__(self, objs: list[Model]) -> None:
         self.__objs = objs
         self.__index = 0
 
     def __iter__(self) -> "QuerySet":
         return self
 
-    def __next__(self) -> T | NoReturn:
+    def __next__(self) -> Model | NoReturn:
         try:
             obj = self.__objs[self.__index]
         except IndexError:
@@ -37,25 +35,25 @@ class QuerySet(Generic[T]):
     def count(self) -> int:
         return len(self.__objs)
 
-    def first(self) -> "QuerySet" | T:
+    def first(self) -> "QuerySet" | Model:
         try:
             return self.__objs[0]
         except IndexError:
             return QuerySet([])
 
-    def last(self) -> "QuerySet" | T:
+    def last(self) -> "QuerySet" | Model:
         try:
             return self.__objs[-1]
         except IndexError:
             return QuerySet([])
 
 
-class QueryManager(Generic[T]):
-    def __init__(self, name: str, model_cls: Type[T]) -> None:
+class QueryManager:
+    def __init__(self, name: str, model_cls: BaseModel) -> None:
         self.table_name = f"{name}_table"
         self.__model_cls = model_cls
 
-    def get(self, id: int) -> T:
+    def get(self, id: int) -> Model:
         with DB(self.table_name) as db:
             obj = db.get_obj(id)
             return obj
@@ -71,13 +69,13 @@ class QueryManager(Generic[T]):
     def count(self) -> int:
         return self.all().count()
 
-    def first(self) -> QuerySet | T:
+    def first(self) -> QuerySet | Model:
         return self.all().first()
 
-    def last(self) -> QuerySet | T:
+    def last(self) -> QuerySet | Model:
         return self.all().last()
 
-    def create(self, **kwargs: Any) -> T:
+    def create(self, **kwargs: Any) -> Model:
         obj = self.__model_cls(**kwargs)
         return obj
 
@@ -85,7 +83,7 @@ class QueryManager(Generic[T]):
 class BaseModel(type):
     def __new__(
         mcs, cls_name: str, bases: tuple, cls_dict: Any
-    ) -> Type[T] | "BaseModel":
+    ) -> Type[Model] | "BaseModel":
         slots = ["fields"]
         fields = cls_dict.get("__annotations__", {})
         fields.update({"id": int})
