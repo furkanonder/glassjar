@@ -111,6 +111,7 @@ class Model(metaclass=BaseModel):
         self.fields = fields
         for field_name, field_value in self.fields.items():
             setattr(self, field_name, field_value)
+        self.save()
 
     def __eq__(self, other):
         if self.as_dict == self.as_dict:
