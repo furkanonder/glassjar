@@ -25,16 +25,15 @@ _glassjar_ can be installed by running `pip install glassjar`.
 >>>
 >>> class Item(Model):
 ...     name: str
-...     count: int
 ...     attrs: dict
 ...
->>> item = Item.records.create(name="test item", count=20, attrs={"color": "red", "shape":"rectangle"})
+>>> item = Item.records.create(name="item", attrs={"color": "red", "shape":"rectangle"})
 >>> item.as_dict()
-{'name': 'test item', 'count': 20}
->>> item2 = Item.records.create(name="test item 2", count=10, attrs={"color": "blue", "shape":"triangle"})
+{'name': 'item', 'attrs': {'color': 'red', 'shape': 'rectangle'}}
+>>> item2 = Item.records.create(name="item 2", attrs={"color": "blue", "shape":"triangle"})
 >>> Item.records.first()
-Item(name='test item', count=20, attrs={'color': 'red', 'shape': 'rectangle'})
+Item(name='item', attrs={'color': 'red', 'shape': 'rectangle'})
 >>> Item.records.last()
-Item(name='test item 2', count=10, attrs={'color': 'blue', 'shape': 'triangle'})
+Item(name='item 2', attrs={'color': 'blue', 'shape': 'triangle'})
 >>>
 ```
