@@ -108,9 +108,20 @@ class Model(metaclass=BaseModel):
     records: ClassVar[QueryManager]
 
     def __init__(self, **fields: Any) -> None:
-        self.fields = fields
-        for field_name, field_value in self.fields.items():
+        self.fields = type(self).__dict__.get("__annotations__", {})
+        un_declared_fields = {
+            k: self.fields[k] for k in set(self.fields) - set(fields)
+        }
+        un_declared_fields.pop("id")
+
+        for field_name, field_value in fields.items():
             setattr(self, field_name, field_value)
+
+        for field_name, field_value in un_declared_fields.items():
+            setattr(
+                self, field_name, un_declared_fields[field_name].__call__()
+            )
+
         self.save()
 
     def __eq__(self, other):
