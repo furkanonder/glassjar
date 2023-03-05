@@ -118,9 +118,7 @@ class Model(metaclass=BaseModel):
             setattr(self, field_name, field_value)
 
         for field_name, field_value in un_declared_fields.items():
-            setattr(
-                self, field_name, un_declared_fields[field_name].__call__()
-            )
+            setattr(self, field_name, un_declared_fields[field_name])
 
         self.save()
 
