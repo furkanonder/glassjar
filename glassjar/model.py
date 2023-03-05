@@ -76,7 +76,7 @@ class QueryManager:
         return self.all().last()
 
     def create(self, **kwargs: Any) -> Model:
-        obj = self.__model_cls(**kwargs)
+        obj = self.__model_cls.__call__(**kwargs)
         return obj
 
 
@@ -88,8 +88,8 @@ class BaseModel(type):
         fields = cls_dict.get("__annotations__", {})
         fields.update({"id": int})
 
-        for field_name, field_type in fields.items():
-            field = Field(field_name, field_type)
+        for field_name in fields:
+            field = Field(field_name)
             cls_dict[field_name] = field
             slots.append(field.storage_name)
 

@@ -70,10 +70,6 @@ class TestModel(TestBase):
 
         self.assertEqual(type(exc.exception), AttributeError)
 
-    def test_type_check(self):
-        with self.assertRaises(TypeError):
-            Car(brand="Tesla", model="Model S", year=2022.4)
-
     def test_as_dict(self):
         car_obj = Car(brand="Tesla", model="Model S", year=2022)
         car_dict = car_obj.as_dict()
@@ -134,7 +130,7 @@ class TestQuery(TestBase):
 
         item2 = Item.records.create()
         self.assertEqual(getattr(item2, "count"), 0)
-        self.assertEqual(getattr(item2, "name"), '')
+        self.assertEqual(getattr(item2, "name"), "")
         item2.name = "guitar"
         item2.save()
         self.assertEqual(item2.name, "guitar")
