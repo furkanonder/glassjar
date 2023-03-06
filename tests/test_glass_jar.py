@@ -51,10 +51,10 @@ class TestModel(TestBase):
 
     def test_delete(self):
         car_obj = Car(brand="Tesla", model="Model S", year=2022).save()
-        car_obj.delete(id=1)
+        car_obj.delete()
 
         self.assertRaises(DoesNotExist, Car.records.get, id=1)
-        self.assertRaises(DoesNotExist, car_obj.delete, id=1)
+        self.assertRaises(DoesNotExist, car_obj.delete)
 
     def test_slot_feature(self):
         car_obj = Car(brand="Tesla", model="Model S", year=2022)
@@ -136,3 +136,10 @@ class TestQuery(TestBase):
 
         item2.name = "guitar"
         self.assertEqual(item2.name, "guitar")
+
+    def test_delete(self):
+        item = Item.records.create(name="fresh item")
+        Item.records.delete(id=item.id)
+
+        with self.assertRaises(DoesNotExist):
+            Item.records.get(id=item.id)
