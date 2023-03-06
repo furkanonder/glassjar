@@ -53,6 +53,14 @@ class QueryManager:
         self.table_name = f"{name}_table"
         self.__model_cls = model_cls
 
+    def create(self, **kwargs: Any) -> Model:
+        obj = self.__model_cls.__call__(**kwargs)
+        return obj
+
+    def delete(self, id) -> None:
+        obj = self.get(id)
+        obj.delete()
+
     def get(self, id: int) -> Model:
         with DB(self.table_name) as db:
             obj = db.get_obj(id)
@@ -74,14 +82,6 @@ class QueryManager:
 
     def last(self) -> QuerySet | Model:
         return self.all().last()
-
-    def create(self, **kwargs: Any) -> Model:
-        obj = self.__model_cls.__call__(**kwargs)
-        return obj
-
-    def delete(self, id) -> None:
-        obj = self.get(id)
-        obj.delete()
 
 
 class BaseModel(type):
