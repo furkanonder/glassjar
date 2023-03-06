@@ -11,8 +11,8 @@
 
 ## Motivation
 
-Glassjar is a database that, unlike other databases, stores records as Python objects in
-the database and allows you to use them with ORM.
+Glassjar is a database that provides a storage mechanism based on pickled Python objects
+with ORM.
 
 ## Installation
 
