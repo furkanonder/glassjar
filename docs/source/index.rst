@@ -1,7 +1,7 @@
 Welcome to GlassJar's documentation!
 ====================================
 
-**GlassJar** is the pickled database that provide Object-Relational Mapper.
+**GlassJar** is a database that provides a storage mechanism based on pickled Python objects with ORM.
 
 .. note::
 
@@ -13,4 +13,3 @@ Contents
 .. toctree::
 
    usage
-   quickstart
