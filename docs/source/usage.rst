@@ -23,7 +23,8 @@ Following the creation of the models, the data associated with the models are st
 Field
 ^^^^^
 
-Each database field must be defined as a class variable in that has a type annotation.
+Each database field must be defined as a class variable in that has a type annotation. The type of objects
+that correspond to the field must be `picklable <https://docs.python.org/3/library/pickle.html#what-can-be-pickled-and-unpickled>`_.
 
 Example::
 
