@@ -57,7 +57,7 @@ class QueryManager:
         obj = self.__model_cls.__call__(**kwargs)
         return obj
 
-    def delete(self, id) -> None:
+    def delete(self, id: int) -> None:
         obj = self.get(id)
         obj.delete()
 
