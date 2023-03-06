@@ -141,18 +141,15 @@ class Model(metaclass=BaseModel):
     def as_dict(self) -> dict[str, Any]:
         return {key: getattr(self, key) for key in self.fields}
 
-    def update(self) -> None:
-        with DB(self.table_name) as db:
-            db.update_record(self.id, self)
-
     def delete(self) -> None:
         with DB(self.table_name) as db:
             db.delete_record(self.id)
 
     def save(self) -> "Model":
-        if hasattr(self, "id"):
-            self.update()
-        else:
-            with DB(self.table_name) as db:
+        with DB(self.table_name) as db:
+            if hasattr(self, "id"):
+                db.update_record(self.id, self)
+            else:
                 db.create_record(self)
+
         return self
