@@ -48,3 +48,41 @@ Model Functions
 
     Converts the model object to a dict.
 
+QuerySet
+--------
+
+.. function:: Model.records.create(**fields)
+
+    It creates a model object and returns it.
+
+    Example::
+
+        item = Item.records.create(
+            name="item",
+            attrs={"color": "red", "shape":"rectangle"}
+        )
+
+
+.. function:: Models.records.delete(id)
+
+    Deletes the model object with the given id.
+
+.. function:: Models.records.get(id)
+
+    Returns the model object with the given id.
+
+.. function:: Models.records.all()
+
+    Returns the all model objects.
+
+.. function:: Models.records.count()
+
+    Returns the count of model objects in the database.
+
+.. function:: Models.records.first()
+
+    Returns the first model object from the database.
+
+.. function:: Models.records.last()
+
+    Returns the last model object from the database.
