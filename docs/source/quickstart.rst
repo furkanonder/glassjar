@@ -23,3 +23,28 @@ Example::
     class Item(Model):
         name: str
         attrs: dict
+
+
+Model Functions
+^^^^^^^^^^^^^^^
+
+.. function:: Model.save(**fields)
+
+    Saves the model object to the database and returns it.
+
+    Example::
+
+        item = Item(
+            name="item",
+            attrs={"color": "red", "shape":"rectangle"}
+        ).save()
+
+
+.. function:: Model.delete()
+
+    Deletes the model object.
+
+.. function:: Model.as_dict()
+
+    Converts the model object to a dict.
+
