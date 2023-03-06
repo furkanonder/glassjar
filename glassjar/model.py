@@ -79,6 +79,10 @@ class QueryManager:
         obj = self.__model_cls.__call__(**kwargs)
         return obj
 
+    def delete(self, id) -> None:
+        obj = self.get(id)
+        obj.delete()
+
 
 class BaseModel(type):
     def __new__(
@@ -141,9 +145,9 @@ class Model(metaclass=BaseModel):
         with DB(self.table_name) as db:
             db.update_record(self.id, self)
 
-    def delete(self, id: int) -> None:
+    def delete(self) -> None:
         with DB(self.table_name) as db:
-            db.delete_record(id)
+            db.delete_record(self.id)
 
     def save(self) -> "Model":
         if hasattr(self, "id"):
