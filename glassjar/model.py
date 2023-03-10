@@ -92,8 +92,11 @@ class BaseModel(type):
         fields = cls_dict.get("__annotations__", {})
         fields.update({"id": int})
 
-        for field_name in fields:
-            field = Field(field_name)
+        meta_cls = cls_dict.get("Meta", {})
+        field_validation = getattr(meta_cls, "field_validation", False)
+
+        for field_name, field_type in fields.items():
+            field = Field(field_name, field_type, validate=field_validation)
             cls_dict[field_name] = field
             slots.append(field.storage_name)
 
