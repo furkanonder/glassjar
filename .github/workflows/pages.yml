@@ -3,9 +3,9 @@ name: Generate documatation
 on:
   push:
     branches:
-      - develop
+      - main
     tags:
-      - "*" # all tags
+      - '*'  # all tags
 
 concurrency:
   group: gh-${{ github.ref }}
@@ -21,8 +21,8 @@ jobs:
       pages: write
       id-token: write
     steps:
-      - id: deployment
-        uses: sphinx-notes/pages@v3
-        with:
-          documentation_path: ./docs/source
-          requirements_path: ./docs/requirements.txt
+    - id: deployment
+      uses: sphinx-notes/pages@v3
+      with:
+        documentation_path: ./docs/source
+        requirements_path: ./docs/requirements.txt
