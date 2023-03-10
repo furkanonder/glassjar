@@ -13,11 +13,11 @@ def get_long_description():
 
 setup(
     name="glassjar",
-    version="0.1.0",
+    version="0.2.0",
     long_description=get_long_description(),
     long_description_content_type="text/markdown",
-    description="Glassjar is the pickled database that provide Object-Relational Mapper.",
-    keywords=["pickled database", "orm"],
+    description="Pickled database that provide Object-Relational Mapper.",
+    keywords=["database", "pickled database", "orm"],
     author="Furkan Onder",
     author_email="furkanonder@protonmail.com",
     url="https://github.com/furkanonder/glassjar/",
@@ -36,6 +36,7 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Utilities",
         "Operating System :: OS Independent ",
