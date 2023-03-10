@@ -34,6 +34,28 @@ Example::
         name: str
         attrs: dict
 
+If you want to validate your model's fields, you can add the ``field_validation`` option to the model's ``meta`` class.
+
+Note that default behaviour of ``field_validation`` is ``False``.
+
+Example::
+
+    >>> from glassjar.model import Model
+    >>>
+    >>> class Car(Model):
+    ...     brand: str
+    ...
+    ...     class Meta:
+    ...         field_validation = True
+    ...
+    >>> c = Car.records.create()
+    >>> c.brand = 1
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+      File "/home/purple/.local/lib/python3.10/site-packages/glassjar/field.py", line 25, in __set__
+        raise TypeError(
+    TypeError: Types are incompatible. Expected type: <class 'str'> | Given type: <class 'int'>
+    >>>
 
 Model Functions
 ^^^^^^^^^^^^^^^
