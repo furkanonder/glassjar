@@ -37,3 +37,5 @@ Item(name='item', attrs={'color': 'red', 'shape': 'rectangle'})
 Item(name='item 2', attrs={'color': 'blue', 'shape': 'triangle'})
 >>>
 ```
+
+Check out our [documentation](https://furkanonder.github.io/glassjar/) to learn more!
