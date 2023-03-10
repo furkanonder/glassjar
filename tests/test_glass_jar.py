@@ -17,6 +17,9 @@ class Car(Model):
     model: str
     year: int
 
+    class Meta:
+        field_validation = True
+
 
 class TestBase(unittest.TestCase):
     def setUp(self):
@@ -69,6 +72,10 @@ class TestModel(TestBase):
             car_obj.table_name = "changed_table"
 
         self.assertEqual(type(exc.exception), AttributeError)
+
+    def test_type_check(self):
+        with self.assertRaises(TypeError):
+            Car(brand="Tesla", model="Model S", year=2022.4)
 
     def test_as_dict(self):
         car_obj = Car(brand="Tesla", model="Model S", year=2022)
