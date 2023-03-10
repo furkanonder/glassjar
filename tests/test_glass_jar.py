@@ -17,6 +17,9 @@ class Car(Model):
     model: str
     year: int
 
+    class Meta:
+        field_validation = True
+
 
 class TestBase(unittest.TestCase):
     def setUp(self):
@@ -51,10 +54,10 @@ class TestModel(TestBase):
 
     def test_delete(self):
         car_obj = Car(brand="Tesla", model="Model S", year=2022).save()
-        car_obj.delete(id=1)
+        car_obj.delete()
 
         self.assertRaises(DoesNotExist, Car.records.get, id=1)
-        self.assertRaises(DoesNotExist, car_obj.delete, id=1)
+        self.assertRaises(DoesNotExist, car_obj.delete)
 
     def test_slot_feature(self):
         car_obj = Car(brand="Tesla", model="Model S", year=2022)
@@ -126,3 +129,24 @@ class TestQuery(TestBase):
 
         items = Item.records.all()
         self.assertEqual(Item.records.count(), items.count())
+
+    def test_create(self):
+        item = Item.records.create(name="fresh item")
+        self.assertEqual(item.name, "fresh item")
+        self.assertTrue(hasattr(item, "name"))
+        self.assertTrue(hasattr(item, "count"))
+        self.assertFalse(hasattr(item, "group"))
+
+        item2 = Item.records.create()
+        self.assertTrue(hasattr(item2, "name"))
+        self.assertTrue(hasattr(item2, "count"))
+
+        item2.name = "guitar"
+        self.assertEqual(item2.name, "guitar")
+
+    def test_delete(self):
+        item = Item.records.create(name="fresh item")
+        Item.records.delete(id=item.id)
+
+        with self.assertRaises(DoesNotExist):
+            Item.records.get(id=item.id)

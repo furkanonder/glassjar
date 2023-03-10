@@ -1,0 +1,28 @@
+name: Generate documatation
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'  # all tags
+
+concurrency:
+  group: gh-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pages:
+    runs-on: ubuntu-20.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+    - id: deployment
+      uses: sphinx-notes/pages@v3
+      with:
+        documentation_path: ./docs/source
+        requirements_path: ./docs/requirements.txt
