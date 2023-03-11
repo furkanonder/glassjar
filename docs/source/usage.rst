@@ -10,6 +10,12 @@ To use GlassJar, first install it using pip:
 
    $ pip install glassjar
 
+
+.. warning::
+
+    Glassjar uses the pickle module. Only use ``database.jar`` files that you trust. For more detail you
+    can check out the `warning section <https://docs.python.org/3/library/pickle.html>`_ in the pickle module.
+
 Model
 -----
 
