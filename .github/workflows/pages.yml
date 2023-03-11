@@ -1,15 +1,8 @@
-name: Generate documatation
+name: Deploy Sphinx documentation to Pages
 
 on:
   push:
-    branches:
-      - main
-    tags:
-      - '*'  # all tags
-
-concurrency:
-  group: gh-${{ github.ref }}
-  cancel-in-progress: true
+    branches: [main]
 
 jobs:
   pages:
@@ -25,4 +18,3 @@ jobs:
       uses: sphinx-notes/pages@v3
       with:
         documentation_path: ./docs/source
-        requirements_path: ./docs/requirements.txt
